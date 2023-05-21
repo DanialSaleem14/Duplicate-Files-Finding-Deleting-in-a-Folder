@@ -1,0 +1,151 @@
+#include<iostream>
+#include<dirent.h>
+using namespace std;
+
+class Node
+{
+	public:
+	string filename;
+	Node *next=NULL;
+};
+// creating a data structure (linked list to store filenames)
+class list
+{
+	public:
+		Node *head;
+		list()
+		{
+			head=new Node;
+			head=NULL;
+		}
+		void insert_name(string filename)
+		{
+			Node *temp;
+			temp=new Node;
+			temp->filename=filename;
+			if(head==NULL)
+			{
+				head=temp;
+			}
+			else if(head!=NULL)
+			{
+				Node *itemp;
+				itemp=head;
+				while(itemp->next!=NULL)
+				{
+					itemp=itemp->next;
+				}
+				itemp->next=temp;				
+			}
+		}
+		void display()
+		{
+			Node *temp;
+			temp=head;
+			while(temp!=NULL)
+			{
+				cout<<temp->filename<<endl;
+				temp=temp->next;
+			}
+		}
+	
+};
+
+
+// a function that removes the files that are duplictes from the "test" directory
+void remove_duplicate(list obj3)
+{
+	string path;
+	char yes;
+	cout<<"do you want to remove the duplicate files? (y/n): ";
+	cin>>yes;
+	if(yes=='y')
+	{
+		
+		Node * temp=obj3.head;
+		while(temp!=NULL)
+		{
+		path = "test\\" + temp->filename;
+		remove(path.c_str());
+		temp=temp->next;
+		}
+	}
+	else
+	{
+		return;
+	}
+}
+
+//function that find the duplicate values in 2 linked lists.
+void find_duplicate(list obj1,list obj2)
+{
+	list obj3;
+	Node* temp1=obj1.head;
+	while(temp1!=NULL)
+	{
+		Node* temp2=obj2.head;
+		while(temp2!=NULL)
+		{
+		if(temp1->filename==temp2->filename)
+		{
+			obj3.insert_name(temp1->filename);
+		}	
+		temp2=temp2->next;
+	}
+	temp1=temp1->next;
+	}
+	cout<<"following are the duplicate files : "<<endl;
+	obj3.display();
+	cout<<endl;
+	remove_duplicate(obj3);
+	
+}
+
+
+void read_dir()
+{
+	list obj,obj1;
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir ("test")) != NULL)
+	{
+  		while ((ent = readdir (dir)) != NULL) 
+  			{
+   				//cout<<ent->d_name<<endl;
+   				obj.insert_name(ent->d_name);
+  			}
+			closedir (dir);
+		cout<<"contents of folder 1 :"<<endl;
+        obj.display();
+        cout<<endl;
+	}	 
+	else 
+	{
+		perror ("");
+	}
+
+	if ((dir = opendir ("other")) != NULL)
+	{
+  		while ((ent = readdir (dir)) != NULL) 
+		{
+   			//cout<<ent->d_name<<endl;
+   			obj1.insert_name(ent->d_name);
+		}
+  			closedir (dir);
+  			cout<<"contents of folder 2 : "<<endl;
+    	obj1.display();
+    	find_duplicate(obj,obj1);
+    	cout<<endl;
+	} 
+	else 
+	{
+		perror ("");
+	}         
+}
+
+
+
+int main()
+{
+	read_dir();
+}
